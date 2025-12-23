@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>운명의 랜덤 뽑기</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #ffeaa7;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 400px;
+      }
+      h1 {
+        color: #d63031;
+        margin-bottom: 30px;
+      }
+      input {
+        padding: 15px;
+        width: 70%;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+        outline: none;
+        text-align: center;
+      }
+      input:focus {
+        border-color: #d63031;
+      }
+      button {
+        margin-top: 15px;
+        padding: 15px 30px;
+        background-color: #d63031;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 80%;
+        transition: 0.3s;
+      }
+      button:hover {
+        background-color: #ff7675;
+      }
+      .machine-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        display: block;
+      }
+      .shake {
+        animation: shake 0.5s infinite;
+      }
+      @keyframes shake {
+        0% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(10deg);
+        }
+        50% {
+          transform: rotate(0deg);
+        }
+        75% {
+          transform: rotate(-10deg);
+        }
+        100% {
+          transform: rotate(0deg);
+        }
+      }
+
+      /* 팝업창 스타일 */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 90%;
+        width: 350px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        animation: popUp 0.3s ease-out;
+      }
+      @keyframes popUp {
+        from {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .result-img {
+        max-width: 100%;
+        max-height: 250px;
+        border-radius: 10px;
+        margin: 15px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .close-btn {
+        background: #555;
+        padding: 10px 20px;
+        margin-top: 10px;
+        width: auto;
+        font-size: 14px;
+      }
+      .close-btn:hover {
+        background: #333;
+      }
+
+      .rank-text {
+        font-size: 24px;
+        color: #d63031;
+        font-weight: bold;
+        margin: 10px 0 5px 0;
+      }
+      .prize-name {
+        font-size: 18px;
+        color: #2d3436;
+        font-weight: bold;
+        margin-bottom: 15px;
+        line-height: 1.4;
+        word-break: keep-all;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="machine" class="machine-icon">🎰</div>
+      <h1>두근두근 뽑기</h1>
+      <input
+        type="text"
+        id="userId"
+        placeholder="아이디를 입력하세요"
+        onkeypress="if(event.keyCode==13) startDraw();"
+      />
+      <button onclick="startDraw()">결과 확인하기</button>
+    </div>
+
+    <div id="resultModal" class="modal">
+      <div class="modal-content">
+        <h2 id="modalTitle">결과 발표!</h2>
+
+        <div id="imageContainer"></div>
+
+        <div id="modalDesc" class="rank-text"></div>
+        <div id="prizeName" class="prize-name"></div>
+
+        <p
+          id="subMsg"
+          style="color: #888; font-size: 14px; margin-top: 5px"
+        ></p>
+        <button class="close-btn" onclick="closeModal()">닫기</button>
+      </div>
+    </div>
+
+    <script>
+      // 상품 목록 설정
+      const PRIZE_LIST = {
+        1: "교메이 리본체조 아크릴",
+        2: "우즈이 리본체조 아크릴",
+        3: "렌고쿠 고구마 냠냠 아크릴",
+        4: "6종 엽서 세트",
+        5: "원하면 증정하는 우리집 고양이 털공<br>(흰색/검정 선택가능)",
+      };
+
+      async function startDraw() {
+        const input = document.getElementById("userId");
+        const id = input.value.trim();
+        const machine = document.getElementById("machine");
+
+        if (!id) {
+          alert("아이디를 입력해주세요!");
+          return;
+        }
+
+        machine.classList.add("shake");
+
+        try {
+          const response = await fetch("/draw", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: id }),
+          });
+          const data = await response.json();
+
+          setTimeout(() => {
+            machine.classList.remove("shake");
+            showPopup(data);
+          }, 1500);
+        } catch (error) {
+          machine.classList.remove("shake");
+          alert("오류가 발생했습니다.");
+        }
+      }
+
+      function showPopup(data) {
+        const modal = document.getElementById("resultModal");
+        const imgContainer = document.getElementById("imageContainer");
+        const title = document.getElementById("modalTitle");
+        const desc = document.getElementById("modalDesc");
+        const pName = document.getElementById("prizeName");
+        const subMsg = document.getElementById("subMsg");
+
+        imgContainer.innerHTML = "";
+        pName.innerHTML = ""; // 상품명 초기화
+        subMsg.innerText = "";
+
+        if (data.error) {
+          title.innerText = "앗!";
+          desc.innerText = data.error;
+          desc.style.color = "black";
+        } else if (data.result === "꽝") {
+          title.innerText = "아쉽습니다..";
+          desc.innerText = "다음 기회에... (꽝)";
+          desc.style.color = "#555";
+        } else {
+          title.innerText = "🎉 축하합니다! 🎉";
+          desc.innerText = data.result + "등 당첨!!";
+          desc.style.color = "#d63031";
+
+          // 상품명 표시
+          if (PRIZE_LIST[data.result]) {
+            pName.innerHTML = PRIZE_LIST[data.result];
+          }
+
+          const img = document.createElement("img");
+          img.src = data.result + ".png";
+          img.className = "result-img";
+          imgContainer.appendChild(img);
+        }
+
+        if (data.msg) subMsg.innerText = "(" + data.msg + ")";
+        modal.style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("resultModal").style.display = "none";
+        document.getElementById("userId").value = "";
+      }
+    </script>
+  </body>
+</html>
