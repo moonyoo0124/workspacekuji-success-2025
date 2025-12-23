@@ -3,30 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>운명의 랜덤 뽑기</title>
+    <title>✨신세계를 영접할 수 있는 기회✨</title>
     <style>
+      /* 1. 배경 화면 설정 */
       body {
         font-family: "Arial", sans-serif;
-        background-color: #ffeaa7;
+        background-image: url("bg.png");
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        min-height: 100vh;
         margin: 0;
       }
+
+      /* 2. 메인 박스 */
       .container {
-        background: white;
+        background: rgba(255, 255, 255, 0.6);
         padding: 40px;
         border-radius: 20px;
         text-align: center;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         width: 90%;
         max-width: 400px;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
       }
+
+      /* 제목 */
       h1 {
         color: #d63031;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
+        font-size: 22px;
+        word-break: keep-all;
+        line-height: 1.4;
       }
+
+      /* 입력창 */
       input {
         padding: 15px;
         width: 70%;
@@ -35,10 +51,13 @@
         font-size: 16px;
         outline: none;
         text-align: center;
+        background: rgba(255, 255, 255, 0.9);
       }
       input:focus {
         border-color: #d63031;
       }
+
+      /* 버튼 */
       button {
         margin-top: 15px;
         padding: 15px 30px;
@@ -55,11 +74,15 @@
       button:hover {
         background-color: #ff7675;
       }
+
+      /* 아이콘 */
       .machine-icon {
         font-size: 80px;
         margin-bottom: 20px;
         display: block;
       }
+
+      /* 애니메이션 */
       .shake {
         animation: shake 0.5s infinite;
       }
@@ -81,7 +104,7 @@
         }
       }
 
-      /* 팝업창 스타일 */
+      /* 팝업창 */
       .modal {
         display: none;
         position: fixed;
@@ -94,6 +117,7 @@
         align-items: center;
         z-index: 1000;
       }
+
       .modal-content {
         background: white;
         padding: 30px;
@@ -104,6 +128,7 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         animation: popUp 0.3s ease-out;
       }
+
       @keyframes popUp {
         from {
           transform: scale(0.5);
@@ -122,12 +147,17 @@
         margin: 15px 0;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
+
       .close-btn {
         background: #555;
         padding: 10px 20px;
         margin-top: 10px;
         width: auto;
         font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
       }
       .close-btn:hover {
         background: #333;
@@ -139,6 +169,7 @@
         font-weight: bold;
         margin: 10px 0 5px 0;
       }
+
       .prize-name {
         font-size: 18px;
         color: #2d3436;
@@ -152,11 +183,12 @@
   <body>
     <div class="container">
       <div id="machine" class="machine-icon">🎰</div>
-      <h1>두근두근 뽑기</h1>
+      <h1>💃스치니들 한정 무료나눔 이벤트🕺</h1>
+
       <input
         type="text"
         id="userId"
-        placeholder="아이디를 입력하세요"
+        placeholder="스레드 아이디를 입력하세요"
         onkeypress="if(event.keyCode==13) startDraw();"
       />
       <button onclick="startDraw()">결과 확인하기</button>
@@ -180,13 +212,13 @@
     </div>
 
     <script>
-      // 상품 목록 설정
+      // ▼▼▼ 수정된 상품 목록 ▼▼▼
       const PRIZE_LIST = {
         1: "교메이 리본체조 아크릴",
         2: "우즈이 리본체조 아크릴",
         3: "렌고쿠 고구마 냠냠 아크릴",
-        4: "6종 엽서 세트",
-        5: "원하면 증정하는 우리집 고양이 털공<br>(흰색/검정 선택가능)",
+        4: "무이치로 무조림 냠냠 아크릴",
+        5: "엽서",
       };
 
       async function startDraw() {
@@ -215,7 +247,7 @@
           }, 1500);
         } catch (error) {
           machine.classList.remove("shake");
-          alert("오류가 발생했습니다.");
+          alert("🥲 오류가 발생했습니다.");
         }
       }
 
@@ -228,7 +260,7 @@
         const subMsg = document.getElementById("subMsg");
 
         imgContainer.innerHTML = "";
-        pName.innerHTML = ""; // 상품명 초기화
+        pName.innerHTML = "";
         subMsg.innerText = "";
 
         if (data.error) {
@@ -240,11 +272,10 @@
           desc.innerText = "다음 기회에... (꽝)";
           desc.style.color = "#555";
         } else {
-          title.innerText = "🎉 축하합니다! 🎉";
+          title.innerText = "🎉 신세계 영접을 축하합니다! 🎉";
           desc.innerText = data.result + "등 당첨!!";
           desc.style.color = "#d63031";
 
-          // 상품명 표시
           if (PRIZE_LIST[data.result]) {
             pName.innerHTML = PRIZE_LIST[data.result];
           }

@@ -9,7 +9,7 @@ app.use(express.json());
 // 데이터 저장 파일 경로
 const DATA_FILE = path.join(__dirname, "data.json");
 
-// 아이디 목록
+// 아이디 목록 (총 20명)
 const ALLOWED_IDS = [
   "iino_hs422",
   "luv_zzri",
@@ -33,13 +33,13 @@ const ALLOWED_IDS = [
   "_ming_miing",
 ];
 
-// 당첨 상품 설정 (등수, 인원수)
+// ▼▼▼ 당첨 인원 설정 (여기서 수정합니다) ▼▼▼
 const PRIZE_SETTINGS = [
-  { rank: 1, count: 1 }, // 1등 1명
-  { rank: 2, count: 1 }, // 2등 1명
-  { rank: 3, count: 1 }, // 3등 1명
-  { rank: 4, count: 3 }, // 4등 3명
-  { rank: 5, count: 3 }, // 5등 3명
+  { rank: 1, count: 1 }, // 1등 (교메이 아크릴): 1명
+  { rank: 2, count: 1 }, // 2등 (우즈이 아크릴): 1명
+  { rank: 3, count: 1 }, // 3등 (렌고쿠 아크릴): 1명
+  { rank: 4, count: 1 }, // 4등 (무이치로 아크릴): 1명
+  { rank: 5, count: 3 }, // 5등 (엽서): 3명
 ];
 const TOTAL_USERS = 20;
 
@@ -71,13 +71,14 @@ function resetGame() {
   });
 
   // 2. 남은 자리 꽝으로 채우기
-  const currentCount = newPool.length; // 현재 9개
-  const loserCount = TOTAL_USERS - currentCount; // 11개
+  const currentCount = newPool.length;
+  const loserCount = TOTAL_USERS - currentCount;
+
   for (let i = 0; i < loserCount; i++) {
     newPool.push("꽝");
   }
 
-  // 3. 섞기
+  // 3. 섞기 (셔플)
   gameState.pool = newPool.sort(() => Math.random() - 0.5);
   gameState.history = {};
   saveData();
@@ -86,6 +87,12 @@ function resetGame() {
 function saveData() {
   fs.writeFileSync(DATA_FILE, JSON.stringify(gameState));
 }
+
+// 초기화 기능 (주소창에 /reset 입력 시)
+app.get("/reset", (req, res) => {
+  resetGame();
+  res.send("<h1>게임이 초기화되었습니다! ♻️</h1><a href='/'>돌아가기</a>");
+});
 
 // 뽑기 요청 처리
 app.post("/draw", (req, res) => {
