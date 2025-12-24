@@ -33,32 +33,22 @@ const ALLOWED_IDS = [
   "_ming_miing",
 ];
 
-// ▼▼▼ 당첨 인원 설정 (여기서 수정합니다) ▼▼▼
+// 당첨 인원 설정
 const PRIZE_SETTINGS = [
-  { rank: 1, count: 1 }, // 1등 (교메이 아크릴): 1명
-  { rank: 2, count: 1 }, // 2등 (우즈이 아크릴): 1명
-  { rank: 3, count: 1 }, // 3등 (렌고쿠 아크릴): 1명
-  { rank: 4, count: 1 }, // 4등 (무이치로 아크릴): 1명
-  { rank: 5, count: 3 }, // 5등 (엽서): 3명
+  { rank: 1, count: 1 },
+  { rank: 2, count: 1 },
+  { rank: 3, count: 1 },
+  { rank: 4, count: 1 },
+  { rank: 5, count: 3 },
 ];
 const TOTAL_USERS = 20;
 
-// 게임 데이터 관리
-let gameState = {
-  pool: [],
-  history: {},
-};
+let gameState = { pool: [], history: {} };
 
-// 데이터 불러오기 또는 초기화
-if (fs.existsSync(DATA_FILE)) {
-  try {
-    gameState = JSON.parse(fs.readFileSync(DATA_FILE));
-  } catch (e) {
-    resetGame();
-  }
-} else {
-  resetGame();
-}
+// ▼▼▼ [중요] 서버 켜질 때마다 무조건 강제 초기화 (테스트용) ▼▼▼
+// 파일이 있어도 무시하고 새로 섞습니다. 문제를 해결하는 핵심 코드입니다.
+resetGame();
+// ▲▲▲▲▲▲
 
 function resetGame() {
   let newPool = [];
@@ -82,37 +72,46 @@ function resetGame() {
   gameState.pool = newPool.sort(() => Math.random() - 0.5);
   gameState.history = {};
   saveData();
+  console.log("게임이 초기화되었습니다. (캡슐 20개 장전 완료)");
 }
 
 function saveData() {
   fs.writeFileSync(DATA_FILE, JSON.stringify(gameState));
 }
 
-// 초기화 기능 (주소창에 /reset 입력 시)
-app.get("/reset", (req, res) => {
-  resetGame();
-  res.send("<h1>게임이 초기화되었습니다! ♻️</h1><a href='/'>돌아가기</a>");
+// 현황 확인 API
+app.get("/status", (req, res) => {
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 꽝: 0 };
+  gameState.pool.forEach((item) => {
+    if (counts[item] !== undefined) counts[item]++;
+  });
+
+  res.json({
+    total: gameState.pool.length,
+    counts: counts,
+  });
 });
 
-// 뽑기 요청 처리
+// 강제 초기화 링크
+app.get("/reset", (req, res) => {
+  resetGame();
+  res.send("<h1>초기화 완료!</h1><a href='/'>돌아가기</a>");
+});
+
+// 뽑기 로직
 app.post("/draw", (req, res) => {
   const { userId } = req.body;
 
   if (!ALLOWED_IDS.includes(userId))
     return res.json({ error: "명단에 없는 아이디입니다." });
-
-  // 이미 뽑은 경우
-  if (gameState.history[userId]) {
+  if (gameState.history[userId])
     return res.json({
       result: gameState.history[userId],
       msg: "이미 참여하셨습니다!",
     });
-  }
-
   if (gameState.pool.length === 0)
     return res.json({ error: "모든 경품이 소진되었습니다." });
 
-  // 뽑기 진행
   const idx = Math.floor(Math.random() * gameState.pool.length);
   const result = gameState.pool.splice(idx, 1)[0];
 

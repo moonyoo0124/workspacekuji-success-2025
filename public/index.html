@@ -3,9 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>✨신세계를 영접할 수 있는 기회✨</title>
+    <title>✨스치니들 한정 새해 선물✨</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://7wtg85-3000.csb.app/" />
+    <meta property="og:title" content="✨스치니들 한정 새해 선물✨" />
+    <meta
+      property="og:description"
+      content="신세계를 영접할 수 있는 기회! 당신의 운을 시험해보세요."
+    />
+    <meta
+      property="og:image"
+      content="https://7wtg85-3000.csb.app/preview.png"
+    />
+
     <style>
-      /* 1. 배경 화면 설정 */
       body {
         font-family: "Arial", sans-serif;
         background-image: url("bg.png");
@@ -20,10 +32,9 @@
         margin: 0;
       }
 
-      /* 2. 메인 박스 */
       .container {
         background: rgba(255, 255, 255, 0.6);
-        padding: 40px;
+        padding: 30px;
         border-radius: 20px;
         text-align: center;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
@@ -31,18 +42,17 @@
         max-width: 400px;
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
+        margin: 20px 0;
       }
 
-      /* 제목 */
       h1 {
         color: #d63031;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         font-size: 22px;
         word-break: keep-all;
         line-height: 1.4;
       }
 
-      /* 입력창 */
       input {
         padding: 15px;
         width: 70%;
@@ -57,7 +67,6 @@
         border-color: #d63031;
       }
 
-      /* 버튼 */
       button {
         margin-top: 15px;
         padding: 15px 30px;
@@ -75,14 +84,12 @@
         background-color: #ff7675;
       }
 
-      /* 아이콘 */
       .machine-icon {
         font-size: 80px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         display: block;
       }
 
-      /* 애니메이션 */
       .shake {
         animation: shake 0.5s infinite;
       }
@@ -93,18 +100,49 @@
         25% {
           transform: rotate(10deg);
         }
-        50% {
-          transform: rotate(0deg);
-        }
         75% {
           transform: rotate(-10deg);
         }
-        100% {
-          transform: rotate(0deg);
-        }
       }
 
-      /* 팝업창 */
+      /* 현황판 스타일 */
+      .status-board {
+        margin-top: 25px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 10px;
+        padding: 15px;
+        font-size: 14px;
+        color: #333;
+        text-align: left;
+      }
+      .status-board h3 {
+        margin: 0 0 10px 0;
+        text-align: center;
+        color: #2d3436;
+        font-size: 16px;
+      }
+      .status-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        border-bottom: 1px dashed #ddd;
+        padding-bottom: 2px;
+      }
+      .status-item:last-child {
+        border-bottom: none;
+      }
+      .count-badge {
+        font-weight: bold;
+        color: #d63031;
+      }
+      .total-left {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #0984e3;
+      }
+
+      /* 팝업 스타일 */
       .modal {
         display: none;
         position: fixed;
@@ -117,7 +155,6 @@
         align-items: center;
         z-index: 1000;
       }
-
       .modal-content {
         background: white;
         padding: 30px;
@@ -128,7 +165,6 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         animation: popUp 0.3s ease-out;
       }
-
       @keyframes popUp {
         from {
           transform: scale(0.5);
@@ -139,15 +175,12 @@
           opacity: 1;
         }
       }
-
       .result-img {
         max-width: 100%;
         max-height: 250px;
         border-radius: 10px;
         margin: 15px 0;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
-
       .close-btn {
         background: #555;
         padding: 10px 20px;
@@ -159,17 +192,12 @@
         border-radius: 5px;
         cursor: pointer;
       }
-      .close-btn:hover {
-        background: #333;
-      }
-
       .rank-text {
         font-size: 24px;
         color: #d63031;
         font-weight: bold;
         margin: 10px 0 5px 0;
       }
-
       .prize-name {
         font-size: 18px;
         color: #2d3436;
@@ -188,21 +216,26 @@
       <input
         type="text"
         id="userId"
-        placeholder="스레드 아이디를 입력하세요"
+        placeholder="스레드 아이디 입력"
         onkeypress="if(event.keyCode==13) startDraw();"
       />
       <button onclick="startDraw()">결과 확인하기</button>
+
+      <div class="status-board">
+        <h3>📊 실시간 남은 상품</h3>
+        <div id="statusList">로딩중...</div>
+        <div class="total-left">
+          남은 캡슐: <span id="totalCount">0</span> / 20개
+        </div>
+      </div>
     </div>
 
     <div id="resultModal" class="modal">
       <div class="modal-content">
         <h2 id="modalTitle">결과 발표!</h2>
-
         <div id="imageContainer"></div>
-
         <div id="modalDesc" class="rank-text"></div>
         <div id="prizeName" class="prize-name"></div>
-
         <p
           id="subMsg"
           style="color: #888; font-size: 14px; margin-top: 5px"
@@ -212,14 +245,52 @@
     </div>
 
     <script>
-      // ▼▼▼ 수정된 상품 목록 ▼▼▼
       const PRIZE_LIST = {
-        1: "교메이 리본체조 아크릴",
-        2: "우즈이 리본체조 아크릴",
-        3: "렌고쿠 고구마 냠냠 아크릴",
-        4: "무이치로 무조림 냠냠 아크릴",
-        5: "엽서",
+        1: "🎀 교메이 아크릴",
+        2: "💎 우즈이 아크릴",
+        3: "🔥 렌고쿠 아크릴",
+        4: "🐹 무이치로 아크릴",
+        5: "📪 엽서 세트",
+        꽝: "💨 꽝 (다음 기회에...)",
       };
+
+      // 처음 접속 시 현황판 업데이트
+      window.onload = updateStatus;
+
+      async function updateStatus() {
+        try {
+          const res = await fetch("/status");
+          const data = await res.json();
+
+          const listDiv = document.getElementById("statusList");
+          const totalSpan = document.getElementById("totalCount");
+
+          let html = "";
+          for (let i = 1; i <= 5; i++) {
+            const count = data.counts[i];
+            const style =
+              count === 0 ? "text-decoration: line-through; color:#aaa;" : "";
+            const badgeStyle = count === 0 ? "color:#aaa;" : "";
+
+            html += `
+                <div class="status-item" style="${style}">
+                    <span>${i}등: ${PRIZE_LIST[i]}</span>
+                    <span class="count-badge" style="${badgeStyle}">${count}개</span>
+                </div>`;
+          }
+          // 꽝 개수 표시
+          html += `
+            <div class="status-item" style="color:#777;">
+                <span>💣 꽝</span>
+                <span>${data.counts["꽝"]}개</span>
+            </div>`;
+
+          listDiv.innerHTML = html;
+          totalSpan.innerText = data.total;
+        } catch (e) {
+          console.error("현황 불러오기 실패");
+        }
+      }
 
       async function startDraw() {
         const input = document.getElementById("userId");
@@ -244,6 +315,7 @@
           setTimeout(() => {
             machine.classList.remove("shake");
             showPopup(data);
+            updateStatus();
           }, 1500);
         } catch (error) {
           machine.classList.remove("shake");
@@ -259,6 +331,14 @@
         const pName = document.getElementById("prizeName");
         const subMsg = document.getElementById("subMsg");
 
+        const FULL_PRIZE_NAMES = {
+          1: "🎀 교메이 리본체조 아크릴",
+          2: "💎 우즈이 리본체조 아크릴",
+          3: "🔥 렌고쿠 고구마 냠냠 아크릴",
+          4: "🐹 무이치로 무조림 냠냠 아크릴",
+          5: "📪 6종 엽서 세트",
+        };
+
         imgContainer.innerHTML = "";
         pName.innerHTML = "";
         subMsg.innerText = "";
@@ -272,12 +352,12 @@
           desc.innerText = "다음 기회에... (꽝)";
           desc.style.color = "#555";
         } else {
-          title.innerText = "🎉 신세계 영접을 축하합니다! 🎉";
+          title.innerText = "🎉 축하합니다! 🎉";
           desc.innerText = data.result + "등 당첨!!";
           desc.style.color = "#d63031";
 
-          if (PRIZE_LIST[data.result]) {
-            pName.innerHTML = PRIZE_LIST[data.result];
+          if (FULL_PRIZE_NAMES[data.result]) {
+            pName.innerHTML = FULL_PRIZE_NAMES[data.result];
           }
 
           const img = document.createElement("img");
