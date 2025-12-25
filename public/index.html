@@ -3,376 +3,167 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>✨스치니들 한정 새해 선물✨</title>
-
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://7wtg85-3000.csb.app/" />
-    <meta property="og:title" content="✨스치니들 한정 새해 선물✨" />
-    <meta
-      property="og:description"
-      content="신세계를 영접할 수 있는 기회! 당신의 운을 시험해보세요."
-    />
-    <meta
-      property="og:image"
-      content="https://7wtg85-3000.csb.app/preview.png"
-    />
-
+    <title>스치니들 한정 무료나눔 이벤트</title>
     <style>
       body {
-        font-family: "Arial", sans-serif;
-        background-image: url("bg.png");
-        background-size: 100% 100%;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        margin: 0;
+        padding: 0;
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        margin: 0;
+        height: 100vh;
+        background-color: #f0f0f0;
+        font-family: "Noto Sans KR", sans-serif;
+        /* 배경 이미지 설정 */
+        background-image: url("/bg.png"); /* public 폴더의 bg.png 사용 */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
       }
 
       .container {
-        background: rgba(255, 255, 255, 0.6);
-        padding: 30px;
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 40px;
         border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         text-align: center;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         width: 90%;
         max-width: 400px;
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        margin: 20px 0;
       }
 
       h1 {
-        color: #d63031;
-        margin-bottom: 20px;
-        font-size: 22px;
+        color: #d32f2f;
+        font-size: 20px;
+        margin-bottom: 30px;
         word-break: keep-all;
-        line-height: 1.4;
+      }
+
+      .slot-machine {
+        font-size: 50px;
+        margin-bottom: 20px;
       }
 
       input {
+        width: 100%;
         padding: 15px;
-        width: 70%;
+        margin-bottom: 15px;
         border: 2px solid #ddd;
         border-radius: 10px;
         font-size: 16px;
-        outline: none;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.9);
-      }
-      input:focus {
-        border-color: #d63031;
+        box-sizing: border-box;
       }
 
       button {
-        margin-top: 15px;
-        padding: 15px 30px;
-        background-color: #d63031;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 18px;
-        cursor: pointer;
-        font-weight: bold;
-        width: 80%;
-        transition: 0.3s;
-      }
-      button:hover {
-        background-color: #ff7675;
-      }
-
-      .machine-icon {
-        font-size: 80px;
-        margin-bottom: 10px;
-        display: block;
-      }
-
-      .shake {
-        animation: shake 0.5s infinite;
-      }
-      @keyframes shake {
-        0% {
-          transform: rotate(0deg);
-        }
-        25% {
-          transform: rotate(10deg);
-        }
-        75% {
-          transform: rotate(-10deg);
-        }
-      }
-
-      /* 현황판 스타일 */
-      .status-board {
-        margin-top: 25px;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 10px;
-        padding: 15px;
-        font-size: 14px;
-        color: #333;
-        text-align: left;
-      }
-      .status-board h3 {
-        margin: 0 0 10px 0;
-        text-align: center;
-        color: #2d3436;
-        font-size: 16px;
-      }
-      .status-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
-        border-bottom: 1px dashed #ddd;
-        padding-bottom: 2px;
-      }
-      .status-item:last-child {
-        border-bottom: none;
-      }
-      .count-badge {
-        font-weight: bold;
-        color: #d63031;
-      }
-      .total-left {
-        text-align: center;
-        font-weight: bold;
-        margin-top: 10px;
-        color: #0984e3;
-      }
-
-      /* 팝업 스타일 */
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
         width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-      .modal-content {
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-        max-width: 90%;
-        width: 350px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        animation: popUp 0.3s ease-out;
-      }
-      @keyframes popUp {
-        from {
-          transform: scale(0.5);
-          opacity: 0;
-        }
-        to {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-      .result-img {
-        max-width: 100%;
-        max-height: 250px;
-        border-radius: 10px;
-        margin: 15px 0;
-      }
-      .close-btn {
-        background: #555;
-        padding: 10px 20px;
-        margin-top: 10px;
-        width: auto;
-        font-size: 14px;
+        padding: 15px;
+        background-color: #d32f2f;
         color: white;
         border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      .rank-text {
-        font-size: 24px;
-        color: #d63031;
-        font-weight: bold;
-        margin: 10px 0 5px 0;
-      }
-      .prize-name {
+        border-radius: 10px;
         font-size: 18px;
-        color: #2d3436;
+        cursor: pointer;
         font-weight: bold;
-        margin-bottom: 15px;
-        line-height: 1.4;
-        word-break: keep-all;
+        transition: background 0.3s;
+      }
+
+      button:hover {
+        background-color: #b71c1c;
+      }
+
+      #status {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #666;
+        font-weight: bold;
+      }
+
+      #result-area {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        min-height: 24px;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <div id="machine" class="machine-icon">🎰</div>
+      <div class="slot-machine">🎰</div>
       <h1>💃스치니들 한정 무료나눔 이벤트🕺</h1>
 
-      <input
-        type="text"
-        id="userId"
-        placeholder="스레드 아이디 입력"
-        onkeypress="if(event.keyCode==13) startDraw();"
-      />
-      <button onclick="startDraw()">결과 확인하기</button>
+      <input type="text" id="username" placeholder="스레드 아이디 입력" />
+      <button onclick="draw()">결과 확인하기</button>
 
-      <div class="status-board">
-        <h3>📊 실시간 남은 상품</h3>
-        <div id="statusList">로딩중...</div>
-        <div class="total-left">
-          남은 캡슐: <span id="totalCount">0</span> / 20개
-        </div>
+      <div id="status">
+        📊 실시간 남은 상품<br /><br />
+        로딩중...
       </div>
-    </div>
-
-    <div id="resultModal" class="modal">
-      <div class="modal-content">
-        <h2 id="modalTitle">결과 발표!</h2>
-        <div id="imageContainer"></div>
-        <div id="modalDesc" class="rank-text"></div>
-        <div id="prizeName" class="prize-name"></div>
-        <p
-          id="subMsg"
-          style="color: #888; font-size: 14px; margin-top: 5px"
-        ></p>
-        <button class="close-btn" onclick="closeModal()">닫기</button>
-      </div>
+      <div id="result-area"></div>
     </div>
 
     <script>
-      const PRIZE_LIST = {
-        1: "🎀 교메이 아크릴",
-        2: "💎 우즈이 아크릴",
-        3: "🔥 렌고쿠 아크릴",
-        4: "🐹 무이치로 아크릴",
-        5: "📪 엽서 세트",
-        꽝: "💨 꽝 (다음 기회에...)",
+      // 페이지 로딩 시 재고 확인
+      window.onload = function () {
+        updateStatus();
       };
 
-      // 처음 접속 시 현황판 업데이트
-      window.onload = updateStatus;
-
-      async function updateStatus() {
-        try {
-          const res = await fetch("/status");
-          const data = await res.json();
-
-          const listDiv = document.getElementById("statusList");
-          const totalSpan = document.getElementById("totalCount");
-
-          let html = "";
-          for (let i = 1; i <= 5; i++) {
-            const count = data.counts[i];
-            const style =
-              count === 0 ? "text-decoration: line-through; color:#aaa;" : "";
-            const badgeStyle = count === 0 ? "color:#aaa;" : "";
-
-            html += `
-                <div class="status-item" style="${style}">
-                    <span>${i}등: ${PRIZE_LIST[i]}</span>
-                    <span class="count-badge" style="${badgeStyle}">${count}개</span>
-                </div>`;
-          }
-          // 꽝 개수 표시
-          html += `
-            <div class="status-item" style="color:#777;">
-                <span>💣 꽝</span>
-                <span>${data.counts["꽝"]}개</span>
-            </div>`;
-
-          listDiv.innerHTML = html;
-          totalSpan.innerText = data.total;
-        } catch (e) {
-          console.error("현황 불러오기 실패");
-        }
+      function updateStatus() {
+        // 주소 앞에 http://... 를 뺐습니다. (자동 감지)
+        fetch("/status")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.counts) {
+              const total = data.total;
+              // const counts = data.counts; // 상세 내역이 필요하면 사용
+              document.getElementById("status").innerHTML =
+                `📊 실시간 남은 상품<br><br>` +
+                `<span style="color:#d32f2f; font-size:1.2em;">남은 캡슐: ${total} / 20개</span>`;
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            document.getElementById("status").innerText =
+              "서버 연결 실패 (새로고침 해주세요)";
+          });
       }
 
-      async function startDraw() {
-        const input = document.getElementById("userId");
-        const id = input.value.trim();
-        const machine = document.getElementById("machine");
-
-        if (!id) {
+      function draw() {
+        const userId = document.getElementById("username").value;
+        if (!userId) {
           alert("아이디를 입력해주세요!");
           return;
         }
 
-        machine.classList.add("shake");
+        const btn = document.querySelector("button");
+        btn.disabled = true;
+        btn.innerText = "두근두근...";
 
-        try {
-          const response = await fetch("/draw", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: id }),
+        fetch("/draw", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: userId }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const resultArea = document.getElementById("result-area");
+            if (data.error) {
+              alert(data.error);
+              resultArea.innerText = "";
+            } else if (data.msg) {
+              alert(data.msg);
+              resultArea.innerText = `이미 뽑으셨군요! 결과: [ ${data.result} ]`;
+            } else {
+              resultArea.innerHTML = `🎉 축하합니다! 🎉<br><br>결과: [ <span style="color:red;">${data.result}</span> ]`;
+            }
+            updateStatus(); // 재고 갱신
+            btn.disabled = false;
+            btn.innerText = "결과 확인하기";
+          })
+          .catch((err) => {
+            alert("오류가 발생했습니다.");
+            btn.disabled = false;
+            btn.innerText = "결과 확인하기";
           });
-          const data = await response.json();
-
-          setTimeout(() => {
-            machine.classList.remove("shake");
-            showPopup(data);
-            updateStatus();
-          }, 1500);
-        } catch (error) {
-          machine.classList.remove("shake");
-          alert("🥲 오류가 발생했습니다.");
-        }
-      }
-
-      function showPopup(data) {
-        const modal = document.getElementById("resultModal");
-        const imgContainer = document.getElementById("imageContainer");
-        const title = document.getElementById("modalTitle");
-        const desc = document.getElementById("modalDesc");
-        const pName = document.getElementById("prizeName");
-        const subMsg = document.getElementById("subMsg");
-
-        const FULL_PRIZE_NAMES = {
-          1: "🎀 교메이 리본체조 아크릴",
-          2: "💎 우즈이 리본체조 아크릴",
-          3: "🔥 렌고쿠 고구마 냠냠 아크릴",
-          4: "🐹 무이치로 무조림 냠냠 아크릴",
-          5: "📪 6종 엽서 세트",
-        };
-
-        imgContainer.innerHTML = "";
-        pName.innerHTML = "";
-        subMsg.innerText = "";
-
-        if (data.error) {
-          title.innerText = "앗!";
-          desc.innerText = data.error;
-          desc.style.color = "black";
-        } else if (data.result === "꽝") {
-          title.innerText = "아쉽습니다..";
-          desc.innerText = "다음 기회에... (꽝)";
-          desc.style.color = "#555";
-        } else {
-          title.innerText = "🎉 축하합니다! 🎉";
-          desc.innerText = data.result + "등 당첨!!";
-          desc.style.color = "#d63031";
-
-          if (FULL_PRIZE_NAMES[data.result]) {
-            pName.innerHTML = FULL_PRIZE_NAMES[data.result];
-          }
-
-          const img = document.createElement("img");
-          img.src = data.result + ".png";
-          img.className = "result-img";
-          imgContainer.appendChild(img);
-        }
-
-        if (data.msg) subMsg.innerText = "(" + data.msg + ")";
-        modal.style.display = "flex";
-      }
-
-      function closeModal() {
-        document.getElementById("resultModal").style.display = "none";
-        document.getElementById("userId").value = "";
       }
     </script>
   </body>
