@@ -10,6 +10,10 @@
   "author": "Ives van Hoorne",
   "license": "MIT",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^8.10.0"
+  },
+  "devDependencies": {
+    "package-json": "10.0.1"
   }
 }
