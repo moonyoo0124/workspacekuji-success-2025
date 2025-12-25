@@ -89,7 +89,7 @@
         list-style: none;
         padding: 0;
         margin: 0;
-        font-size: 13px; /* 글씨가 길어져서 살짝 줄임 */
+        font-size: 13px;
         text-align: left;
       }
 
@@ -104,25 +104,76 @@
       .stock-list li:last-child {
         border-bottom: none;
       }
-
       .item-name {
         flex: 1;
         padding-right: 10px;
         word-break: keep-all;
       }
-
       .sold-out {
         text-decoration: line-through;
         color: #aaa;
       }
 
-      #result-area {
-        margin-top: 20px;
-        font-size: 18px;
+      /* ▼▼▼ 팝업창(모달) 디자인 추가 ▼▼▼ */
+      #modal-overlay {
+        display: none; /* 평소엔 숨김 */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #modal-content {
+        background-color: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 90%;
+        width: 320px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        animation: popUp 0.3s ease-out;
+      }
+
+      @keyframes popUp {
+        from {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      #prize-image {
+        width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+        margin-bottom: 20px;
+        border-radius: 10px;
+      }
+
+      #prize-text {
+        font-size: 20px;
         font-weight: bold;
         color: #333;
-        min-height: 24px;
+        margin-bottom: 20px;
         word-break: keep-all;
+      }
+
+      .close-btn {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -140,8 +191,15 @@
           <li>로딩중...</li>
         </ul>
       </div>
+    </div>
 
-      <div id="result-area"></div>
+    <div id="modal-overlay">
+      <div id="modal-content">
+        <h2 id="modal-title">🎉 축하합니다! 🎉</h2>
+        <img id="prize-image" src="" alt="경품이미지" />
+        <div id="prize-text"></div>
+        <button class="close-btn" onclick="closeModal()">닫기</button>
+      </div>
     </div>
 
     <script>
@@ -149,7 +207,6 @@
         updateStatus();
       };
 
-      // ▼▼▼ 여기가 상품 이름 설정하는 곳입니다! ▼▼▼
       const names = {
         1: "🎀 S상: 교메이 리본체조 아크릴",
         2: "💎 A상: 우즈이 리본체조 아크릴",
@@ -166,15 +223,12 @@
             if (data.counts) {
               const list = document.getElementById("stock-list");
               list.innerHTML = "";
-
               const keys = ["1", "2", "3", "4", "5", "꽝"];
               let totalLeft = 0;
 
               keys.forEach((key) => {
                 const count = data.counts[key] || 0;
                 const name = names[key];
-
-                // 꽝은 전체 개수에 포함 안 함 (상품만 카운트)
                 if (key !== "꽝") totalLeft += count;
 
                 const li = document.createElement("li");
@@ -186,15 +240,12 @@
                 }
                 list.appendChild(li);
               });
-
               document.querySelector(
                 ".status-title"
               ).innerText = `📊 실시간 남은 상품 (총 ${totalLeft}개)`;
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
 
       function draw() {
@@ -215,32 +266,65 @@
         })
           .then((res) => res.json())
           .then((data) => {
-            const resultArea = document.getElementById("result-area");
-            if (data.error) {
-              alert(data.error);
-              resultArea.innerText = "";
-            } else if (data.msg) {
-              alert(data.msg);
-              // 이미 뽑은 결과도 이름으로 변환해서 보여주기
-              const prevRank = data.result;
-              const prevName = names[prevRank] || prevRank;
-              resultArea.innerHTML = `이미 참여하셨습니다!<br><br>내 결과: [ <span style="color:blue;">${prevName}</span> ]`;
-            } else {
-              // 당첨 결과 이름으로 변환
-              const rank = data.result;
-              const rankName = names[rank] || rank;
-
-              resultArea.innerHTML = `🎉 축하합니다! 🎉<br><br>당첨: [ <span style="color:red; font-size:1.1em;">${rankName}</span> ]`;
-            }
-            updateStatus();
             btn.disabled = false;
             btn.innerText = "결과 확인하기";
+
+            if (data.error) {
+              alert(data.error);
+            } else if (data.msg) {
+              // 이미 참여한 경우
+              showModal(data.result, true);
+            } else {
+              // 새로 당첨된 경우
+              showModal(data.result, false);
+            }
+            updateStatus();
           })
           .catch((err) => {
             alert("오류가 발생했습니다.");
             btn.disabled = false;
             btn.innerText = "결과 확인하기";
           });
+      }
+
+      // 팝업창 띄우는 함수
+      function showModal(rank, isAlreadyJoined) {
+        const modal = document.getElementById("modal-overlay");
+        const title = document.getElementById("modal-title");
+        const img = document.getElementById("prize-image");
+        const text = document.getElementById("prize-text");
+        const name = names[rank] || rank;
+
+        modal.style.display = "flex"; // 팝업 보이기
+
+        if (isAlreadyJoined) {
+          title.innerText = "✋ 이미 참여하셨습니다";
+          title.style.color = "blue";
+        } else if (rank === "꽝") {
+          title.innerText = "앗...";
+          title.style.color = "black";
+        } else {
+          title.innerText = "🎉 축하합니다! 🎉";
+          title.style.color = "#d32f2f";
+        }
+
+        text.innerText = name;
+
+        // 이미지 설정 로직
+        if (rank === "꽝") {
+          // 꽝일 때는 이미지 숨기거나 꽝 이미지 사용 (여기선 숨김 예시)
+          img.style.display = "none";
+          // 만약 꽝 이미지가 있다면: img.src = '/bomb.png'; img.style.display = 'block';
+          text.style.fontSize = "30px"; // 꽝 글씨 크게
+        } else {
+          // 1, 2, 3, 4, 5.png 파일 불러오기
+          img.src = `/${rank}.png`;
+          img.style.display = "block";
+        }
+      }
+
+      function closeModal() {
+        document.getElementById("modal-overlay").style.display = "none";
       }
     </script>
   </body>
