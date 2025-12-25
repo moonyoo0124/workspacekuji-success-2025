@@ -69,7 +69,6 @@
         background-color: #b71c1c;
       }
 
-      /* 재고 리스트 디자인 */
       #status-box {
         margin-top: 20px;
         padding: 15px;
@@ -90,19 +89,26 @@
         list-style: none;
         padding: 0;
         margin: 0;
-        font-size: 14px;
+        font-size: 13px; /* 글씨가 길어져서 살짝 줄임 */
         text-align: left;
       }
 
       .stock-list li {
-        padding: 5px 0;
+        padding: 8px 0;
         border-bottom: 1px dashed #ddd;
         display: flex;
         justify-content: space-between;
+        align-items: center;
       }
 
       .stock-list li:last-child {
         border-bottom: none;
+      }
+
+      .item-name {
+        flex: 1;
+        padding-right: 10px;
+        word-break: keep-all;
       }
 
       .sold-out {
@@ -143,46 +149,44 @@
         updateStatus();
       };
 
+      // ▼▼▼ 여기가 상품 이름 설정하는 곳입니다! ▼▼▼
+      const names = {
+        1: "🎀 S상: 교메이 리본체조 아크릴",
+        2: "💎 A상: 우즈이 리본체조 아크릴",
+        3: "🔥 B상: 렌고쿠 고구마 냠냠 아크릴",
+        4: "🐹 C상: 무이치로 무조림 냠냠 아크릴",
+        5: "📪 D상: 6종 엽서 세트",
+        꽝: "💣 꽝 (다음 기회에)",
+      };
+
       function updateStatus() {
         fetch("/status")
           .then((res) => res.json())
           .then((data) => {
             if (data.counts) {
               const list = document.getElementById("stock-list");
-              list.innerHTML = ""; // 기존 목록 초기화
+              list.innerHTML = "";
 
-              // 등수별 이름표 (원하는 대로 수정 가능!)
-              const names = {
-                1: "🥇 1등상",
-                2: "🥈 2등상",
-                3: "🥉 3등상",
-                4: "🏅 4등상",
-                5: "🎖️ 5등상",
-                꽝: "💣 꽝 (다음 기회에)",
-              };
-
-              // 리스트 만들기
-              // 순서대로 보여주기 위해 키 배열 생성 (1,2,3,4,5,꽝)
               const keys = ["1", "2", "3", "4", "5", "꽝"];
-
               let totalLeft = 0;
 
               keys.forEach((key) => {
                 const count = data.counts[key] || 0;
-                const name = names[key] || key + "등";
-                totalLeft += count;
+                const name = names[key];
+
+                // 꽝은 전체 개수에 포함 안 함 (상품만 카운트)
+                if (key !== "꽝") totalLeft += count;
 
                 const li = document.createElement("li");
                 if (count === 0) {
                   li.className = "sold-out";
-                  li.innerHTML = `<span>${name}</span> <span>품절</span>`;
+                  li.innerHTML = `<span class="item-name">${name}</span> <span>품절</span>`;
                 } else {
-                  li.innerHTML = `<span>${name}</span> <span style="color:#d32f2f; font-weight:bold;">${count}개</span>`;
+                  li.innerHTML = `<span class="item-name">${name}</span> <span style="color:#d32f2f; font-weight:bold;">${count}개</span>`;
                 }
                 list.appendChild(li);
               });
 
-              // 전체 개수 표시 업데이트 (제목 옆에 작게)
               document.querySelector(
                 ".status-title"
               ).innerText = `📊 실시간 남은 상품 (총 ${totalLeft}개)`;
@@ -217,12 +221,18 @@
               resultArea.innerText = "";
             } else if (data.msg) {
               alert(data.msg);
-              resultArea.innerText = `이미 뽑으셨군요! 결과: [ ${data.result}등 ]`;
+              // 이미 뽑은 결과도 이름으로 변환해서 보여주기
+              const prevRank = data.result;
+              const prevName = names[prevRank] || prevRank;
+              resultArea.innerHTML = `이미 참여하셨습니다!<br><br>내 결과: [ <span style="color:blue;">${prevName}</span> ]`;
             } else {
-              const rank = data.result === "꽝" ? "꽝" : data.result + "등";
-              resultArea.innerHTML = `🎉 축하합니다! 🎉<br><br>결과: [ <span style="color:red; font-size:1.3em;">${rank}</span> ]`;
+              // 당첨 결과 이름으로 변환
+              const rank = data.result;
+              const rankName = names[rank] || rank;
+
+              resultArea.innerHTML = `🎉 축하합니다! 🎉<br><br>당첨: [ <span style="color:red; font-size:1.1em;">${rankName}</span> ]`;
             }
-            updateStatus(); // 뽑은 후 즉시 재고 갱신
+            updateStatus();
             btn.disabled = false;
             btn.innerText = "결과 확인하기";
           })
