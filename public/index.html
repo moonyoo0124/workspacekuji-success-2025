@@ -11,11 +11,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        min-height: 100vh;
         background-color: #f0f0f0;
         font-family: "Noto Sans KR", sans-serif;
-        /* 배경 이미지 설정 */
-        background-image: url("/bg.png"); /* public 폴더의 bg.png 사용 */
+        background-image: url("/bg.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -23,30 +22,30 @@
 
       .container {
         background-color: rgba(255, 255, 255, 0.95);
-        padding: 40px;
+        padding: 30px;
         border-radius: 20px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         text-align: center;
-        width: 90%;
+        width: 85%;
         max-width: 400px;
       }
 
       h1 {
         color: #d32f2f;
         font-size: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         word-break: keep-all;
       }
 
       .slot-machine {
         font-size: 50px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
       }
 
       input {
         width: 100%;
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: 12px;
+        margin-bottom: 10px;
         border: 2px solid #ddd;
         border-radius: 10px;
         font-size: 16px;
@@ -70,11 +69,45 @@
         background-color: #b71c1c;
       }
 
-      #status {
+      /* 재고 리스트 디자인 */
+      #status-box {
         margin-top: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        border: 1px solid #eee;
+      }
+
+      .status-title {
         font-size: 14px;
         color: #666;
         font-weight: bold;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .stock-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 14px;
+        text-align: left;
+      }
+
+      .stock-list li {
+        padding: 5px 0;
+        border-bottom: 1px dashed #ddd;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .stock-list li:last-child {
+        border-bottom: none;
+      }
+
+      .sold-out {
+        text-decoration: line-through;
+        color: #aaa;
       }
 
       #result-area {
@@ -83,6 +116,7 @@
         font-weight: bold;
         color: #333;
         min-height: 24px;
+        word-break: keep-all;
       }
     </style>
   </head>
@@ -94,36 +128,68 @@
       <input type="text" id="username" placeholder="스레드 아이디 입력" />
       <button onclick="draw()">결과 확인하기</button>
 
-      <div id="status">
-        📊 실시간 남은 상품<br /><br />
-        로딩중...
+      <div id="status-box">
+        <span class="status-title">📊 실시간 남은 상품 현황</span>
+        <ul id="stock-list" class="stock-list">
+          <li>로딩중...</li>
+        </ul>
       </div>
+
       <div id="result-area"></div>
     </div>
 
     <script>
-      // 페이지 로딩 시 재고 확인
       window.onload = function () {
         updateStatus();
       };
 
       function updateStatus() {
-        // 주소 앞에 http://... 를 뺐습니다. (자동 감지)
         fetch("/status")
           .then((res) => res.json())
           .then((data) => {
             if (data.counts) {
-              const total = data.total;
-              // const counts = data.counts; // 상세 내역이 필요하면 사용
-              document.getElementById("status").innerHTML =
-                `📊 실시간 남은 상품<br><br>` +
-                `<span style="color:#d32f2f; font-size:1.2em;">남은 캡슐: ${total} / 20개</span>`;
+              const list = document.getElementById("stock-list");
+              list.innerHTML = ""; // 기존 목록 초기화
+
+              // 등수별 이름표 (원하는 대로 수정 가능!)
+              const names = {
+                1: "🥇 1등상",
+                2: "🥈 2등상",
+                3: "🥉 3등상",
+                4: "🏅 4등상",
+                5: "🎖️ 5등상",
+                꽝: "💣 꽝 (다음 기회에)",
+              };
+
+              // 리스트 만들기
+              // 순서대로 보여주기 위해 키 배열 생성 (1,2,3,4,5,꽝)
+              const keys = ["1", "2", "3", "4", "5", "꽝"];
+
+              let totalLeft = 0;
+
+              keys.forEach((key) => {
+                const count = data.counts[key] || 0;
+                const name = names[key] || key + "등";
+                totalLeft += count;
+
+                const li = document.createElement("li");
+                if (count === 0) {
+                  li.className = "sold-out";
+                  li.innerHTML = `<span>${name}</span> <span>품절</span>`;
+                } else {
+                  li.innerHTML = `<span>${name}</span> <span style="color:#d32f2f; font-weight:bold;">${count}개</span>`;
+                }
+                list.appendChild(li);
+              });
+
+              // 전체 개수 표시 업데이트 (제목 옆에 작게)
+              document.querySelector(
+                ".status-title"
+              ).innerText = `📊 실시간 남은 상품 (총 ${totalLeft}개)`;
             }
           })
           .catch((err) => {
             console.error(err);
-            document.getElementById("status").innerText =
-              "서버 연결 실패 (새로고침 해주세요)";
           });
       }
 
@@ -151,11 +217,12 @@
               resultArea.innerText = "";
             } else if (data.msg) {
               alert(data.msg);
-              resultArea.innerText = `이미 뽑으셨군요! 결과: [ ${data.result} ]`;
+              resultArea.innerText = `이미 뽑으셨군요! 결과: [ ${data.result}등 ]`;
             } else {
-              resultArea.innerHTML = `🎉 축하합니다! 🎉<br><br>결과: [ <span style="color:red;">${data.result}</span> ]`;
+              const rank = data.result === "꽝" ? "꽝" : data.result + "등";
+              resultArea.innerHTML = `🎉 축하합니다! 🎉<br><br>결과: [ <span style="color:red; font-size:1.3em;">${rank}</span> ]`;
             }
-            updateStatus(); // 재고 갱신
+            updateStatus(); // 뽑은 후 즉시 재고 갱신
             btn.disabled = false;
             btn.innerText = "결과 확인하기";
           })
